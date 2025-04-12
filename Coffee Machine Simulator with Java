@@ -1,0 +1,141 @@
+// CoffeeDrink.java
+package machine;
+
+import java.util.Scanner;
+
+class CoffeeDrink {
+    public final int water;
+    public final int milk;
+    public final int beans;
+    public final int cost;
+
+    public CoffeeDrink(int water, int milk, int beans, int cost) {
+        this.water = water;
+        this.milk = milk;
+        this.beans = beans;
+        this.cost = cost;
+    }
+}
+
+public class CoffeeMachine {
+    private int water = 400;
+    private int milk = 540;
+    private int beans = 120;
+    private int cups = 9;
+    private int money = 550;
+    private int doneCups = 0;
+
+    private final Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        CoffeeMachine machine = new CoffeeMachine();
+        machine.run();
+    }
+
+    public void run() {
+        while (true) {
+            System.out.println("\nWrite action (buy, fill, take, clean, remaining, exit):");
+            String action = scanner.next();
+
+            switch (action) {
+                case "buy" -> buy();
+                case "fill" -> fill();
+                case "take" -> take();
+                case "clean" -> clean();
+                case "remaining" -> printStatus();
+                case "exit" -> {
+                    scanner.close();
+                    return;
+                }
+                default -> System.out.println("Unknown command");
+            }
+        }
+    }
+
+    private void buy() {
+        if (doneCups >= 10) {
+            System.out.println("I need cleaning!");
+            return;
+        }
+
+        System.out.println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:");
+        String choice = scanner.next();
+
+        CoffeeDrink drink;
+        switch (choice) {
+            case "1" -> drink = new CoffeeDrink(250, 0, 16, 4);
+            case "2" -> drink = new CoffeeDrink(350, 75, 20, 7);
+            case "3" -> drink = new CoffeeDrink(200, 100, 12, 6);
+            case "back" -> {
+                return;
+            }
+            default -> {
+                System.out.println("Unknown coffee type.");
+                return;
+            }
+        }
+
+        if (!canMakeCoffee(drink)) {
+            return;
+        }
+
+        water -= drink.water;
+        milk -= drink.milk;
+        beans -= drink.beans;
+        cups--;
+        money += drink.cost;
+        doneCups++;
+
+        System.out.println("I have enough resources, making you a coffee!");
+    }
+
+    private boolean canMakeCoffee(CoffeeDrink drink) {
+        if (water < drink.water) {
+            System.out.println("Sorry, not enough water!");
+            return false;
+        }
+        if (milk < drink.milk) {
+            System.out.println("Sorry, not enough milk!");
+            return false;
+        }
+        if (beans < drink.beans) {
+            System.out.println("Sorry, not enough coffee beans!");
+            return false;
+        }
+        if (cups < 1) {
+            System.out.println("Sorry, not enough disposable cups!");
+            return false;
+        }
+        return true;
+    }
+
+    private void fill() {
+        System.out.println("Write how many ml of water you want to add:");
+        water += scanner.nextInt();
+        System.out.println("Write how many ml of milk you want to add:");
+        milk += scanner.nextInt();
+        System.out.println("Write how many grams of coffee beans you want to add:");
+        beans += scanner.nextInt();
+        System.out.println("Write how many disposable cups you want to add:");
+        cups += scanner.nextInt();
+    }
+
+    private void take() {
+        System.out.println("I gave you $" + money);
+        money = 0;
+    }
+
+    private void printStatus() {
+        System.out.println("\nThe coffee machine has:");
+        System.out.println(water + " ml of water");
+        System.out.println(milk + " ml of milk");
+        System.out.println(beans + " g of coffee beans");
+        System.out.println(cups + " disposable cups");
+        System.out.println("$" + money + " of money");
+    }
+
+    private void clean() {
+        doneCups = 0;
+        System.out.println("I have been cleaned!");
+    }
+}
